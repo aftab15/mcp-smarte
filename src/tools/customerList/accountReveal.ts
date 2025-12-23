@@ -12,11 +12,13 @@ import { ACCOUNT_REVEAL_ERRORS } from "./constants/accountRevealConstants";
  * @param server - MCP server instance
  */
 export function registerAccountRevealTool(server: McpServer) {
+  // @ts-ignore
   server.tool(
     "account_reveal",
     "Reveal comprehensive account information using company GUIDs. Returns detailed company data including contacts, firmographics, and other account information.",
     AccountRevealRequestSchema.shape,
-    async (params: AccountRevealRequest) => {
+   // @ts-ignore
+    async (params: any) => {
       try {
         // Validate request
         const validation = AccountRevealService.validateRequest(params);

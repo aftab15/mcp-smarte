@@ -2,7 +2,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { makePOSTRequest } from "../../services/http";
 import { getForwardedHeaders } from "../../context/requestContext";
-import { ENRICH_LEAD_RESPONSE_FIELDS } from "../../constants/responseFields";
 import { config } from "../../config/config";
 
 export function registerEnrichLeadTool(server: McpServer) {
@@ -20,7 +19,10 @@ Returns comprehensive data including:
       recordId: z.string().optional().describe("Record ID for the lead"),
       contactGuid: z.string().optional().describe("Contact GUID"),
       contactEmail: z.string().optional().describe("Contact email address"),
-      contactUrl: z.string().optional().describe("Contact LinkedIn or profile URL"),
+      contactUrl: z
+        .string()
+        .optional()
+        .describe("Contact LinkedIn or profile URL"),
       contactFullName: z.string().optional().describe("Contact full name"),
       contactFirstName: z.string().optional().describe("Contact first name"),
       contactLastName: z.string().optional().describe("Contact last name"),
@@ -36,7 +38,8 @@ Returns comprehensive data including:
       contactFirstName,
       contactLastName,
     }) => {
-      const url = config.enrichLeadUrl;
+      const url = config.enrichUrl;
+      const apiKey = config.enrichApiKey;
 
       const requestBody = {
         companyName,
@@ -52,16 +55,22 @@ Returns comprehensive data including:
 
       const headers = getForwardedHeaders();
 
-      if (!headers || !headers["apikey"]) {
-        return { content: [{ type: "text", text: "Missing API Key header" }] };
+      if (!apiKey) {
+        return { content: [{ type: "text", text: "Missing API Key" }] };
       }
+
+      headers["apikey"] = apiKey;
 
       const data = await makePOSTRequest<unknown>(url, requestBody, headers);
       if (!data) {
-        return { content: [{ type: "text", text: "Failed to enrich lead data" }] };
+        return {
+          content: [{ type: "text", text: "Failed to enrich lead data" }],
+        };
       }
 
-      return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+      return {
+        content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+      };
     }
   );
 }

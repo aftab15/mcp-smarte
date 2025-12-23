@@ -9,6 +9,7 @@ import {
   DataInsightRequestToolSchema,
 } from "./request/DataInsightRequestSchemas";
 import { AdvancedSearchService } from "./services/AdvancedSearchService";
+import { isHttpError, formatHttpError } from "../../services/http";
 
 export function registerAdvancedSearchTool(server: McpServer) {
   server.tool(
@@ -30,6 +31,18 @@ export function registerAdvancedSearchTool(server: McpServer) {
           params,
           headers
         );
+
+        // Check for HTTP error response (e.g., 401 Unauthorized)
+        if (isHttpError(responseData)) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: formatHttpError(responseData),
+              },
+            ],
+          };
+        }
 
         if (!responseData) {
           return {
@@ -80,6 +93,18 @@ export function registerAdvancedSearchTool(server: McpServer) {
             headers
           );
 
+        // Check for HTTP error response (e.g., 401 Unauthorized)
+        if (isHttpError(countData)) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: formatHttpError(countData),
+              },
+            ],
+          };
+        }
+
         if (!countData) {
           return {
             content: [
@@ -129,6 +154,18 @@ export function registerAdvancedSearchTool(server: McpServer) {
           params,
           headers
         );
+
+        // Check for HTTP error response (e.g., 401 Unauthorized)
+        if (isHttpError(insightsData)) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: formatHttpError(insightsData),
+              },
+            ],
+          };
+        }
 
         if (!insightsData) {
           return {

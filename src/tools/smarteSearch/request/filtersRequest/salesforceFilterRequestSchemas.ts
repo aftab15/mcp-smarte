@@ -14,7 +14,7 @@ const accountSchema = z.object({
     .array(crmValueFilterSchema)
     .optional()
     .describe(
-      "Filter by Salesforce Account Name. Requires recordId and name pairs. Use the search_mmi_records tool with entityType='ACCOUNT' to search and retrieve matching account recordIds and names based on search text."
+      "Filter by Salesforce Account Name. Requires recordId and name pairs. IMPORTANT: Use the 'search_mmi_records' tool with entityType='ACCOUNT' to search and retrieve matching account recordIds and names based on search text."
     ),
   sfAccountType: z
     .array(ValueFilterSchema)
@@ -43,7 +43,7 @@ const leadSchema = z.object({
     .array(crmValueFilterSchema)
     .optional()
     .describe(
-      "Filter by Salesforce Lead Name. Requires recordId and name pairs. Use the search_mmi_records tool with entityType='LEAD' to search and retrieve matching lead recordIds and names based on search text."
+      "Filter by Salesforce Lead Name. Requires recordId and name pairs. IMPORTANT: Use the 'search_mmi_records' tool with entityType='LEAD' to search and retrieve matching lead recordIds and names based on search text."
     ),
   sfLeadStatus: z
     .array(ValueFilterSchema)
@@ -64,7 +64,7 @@ const contactSchema = z.object({
     .array(crmValueFilterSchema)
     .optional()
     .describe(
-      "Filter by Salesforce Contact Name. Requires recordId and name pairs. Use the search_mmi_records tool with entityType='CONTACT' to search and retrieve matching contact recordIds and names based on search text."
+      "Filter by Salesforce Contact Name. Requires recordId and name pairs. IMPORTANT: Use the 'search_mmi_records' tool with entityType='CONTACT' to search and retrieve matching contact recordIds and names based on search text."
     ),
 });
 

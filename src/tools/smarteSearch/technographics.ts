@@ -1,13 +1,17 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { makePOSTRequest } from "../../services/http";
+import {
+  makePOSTRequest,
+  isHttpError,
+  formatHttpError,
+} from "../../services/http";
 import { getForwardedHeaders } from "../../context/requestContext";
 import { config } from "../../config/config";
 
 export function registerTechnographicsSearchTool(server: McpServer) {
   server.tool(
     "technographics_search",
-    `Search for technographic data of a company using its GUID.
+    `Search for technographic or companies product's data of a company using its GUID.
     
 Returns technology stack information with the following details for each product:
 - Product: code (P-xxxx) and name
@@ -52,6 +56,19 @@ Returns technology stack information with the following details for each product
       }
 
       const data = await makePOSTRequest<unknown>(url, requestBody, headers);
+
+      // Check for HTTP error response (e.g., 401 Unauthorized)
+      if (isHttpError(data)) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: formatHttpError(data),
+            },
+          ],
+        };
+      }
+
       if (!data) {
         return {
           content: [
@@ -102,6 +119,19 @@ Returns the total count of technology entries and related statistics in JSON for
       }
 
       const data = await makePOSTRequest<unknown>(url, requestBody, headers);
+
+      // Check for HTTP error response (e.g., 401 Unauthorized)
+      if (isHttpError(data)) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: formatHttpError(data),
+            },
+          ],
+        };
+      }
+
       if (!data) {
         return {
           content: [

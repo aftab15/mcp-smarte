@@ -6,6 +6,7 @@
 // Main tool registration
 export { registerContactRevealTool } from "./contactReveal";
 export { registerAccountRevealTool } from "./accountReveal";
+export { registerListsFilterTool } from "./listsFilter";
 
 // Request schemas - Contact Reveal
 export {
@@ -25,9 +26,22 @@ export {
   type AccountRevealType,
 } from "./request/accountRevealRequestSchema";
 
+// Request schemas - Lists Filter
+export {
+  ListsFilterRequestSchema,
+  ListsFilterPaginationSchema,
+  ListsFilterDataSchema,
+  ListsFilterTypeEnum,
+  type ListsFilterRequest,
+  type ListsFilterPagination,
+  type ListsFilterData,
+  type ListsFilterType,
+} from "./request/listsFilterRequestSchema";
+
 // Services
 export { ContactRevealService } from "./services/ContactRevealService";
 export { AccountRevealService } from "./services/AccountRevealService";
+export { ListsFilterService } from "./services/ListsFilterService";
 
 // Constants - Contact Reveal
 export {
@@ -45,6 +59,13 @@ export {
   ACCOUNT_REVEAL_CONSTRAINTS,
   ACCOUNT_REVEAL_DEFAULTS,
 } from "./constants/accountRevealConstants";
+
+// Constants - Lists Filter
+export {
+  LISTS_FILTER_ENDPOINTS,
+  LISTS_FILTER_ERRORS,
+  LISTS_FILTER_CONSTRAINTS,
+} from "./constants/listsFilterConstants";
 
 // Types - Contact Reveal
 export type {

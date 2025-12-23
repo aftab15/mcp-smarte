@@ -15,6 +15,18 @@ export interface ContactRevealResponse {
   error?: string;
 }
 
+export interface ContactRevealedGuidsResponse {
+  status?: {
+    statusCode?: number;
+    message?: string;
+    requestId?: string;
+  };
+  data?: {
+    queuedRevealsList?: string[];
+    revealedList?: string[];
+  };
+}
+
 /**
  * Contact Reveal Data Item in Response
  */

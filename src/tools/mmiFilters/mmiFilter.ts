@@ -6,6 +6,7 @@ import {
 } from "./request/mmiFilterRequestSchema";
 import { MMIFilterService } from "./services/MMIFilterService";
 import { MMI_FILTER_ERRORS } from "./constants/mmiFilterConstants";
+import { isHttpError, formatHttpError } from "../../services/http";
 
 /**
  * Register MMI filter tool with MCP server
@@ -35,9 +36,7 @@ export function registerMMIFilterTool(server: McpServer) {
         const headers = getForwardedHeaders();
         if (!headers || !headers["Authorization"]) {
           return {
-            content: [
-              { type: "text", text: MMI_FILTER_ERRORS.MISSING_AUTH },
-            ],
+            content: [{ type: "text", text: MMI_FILTER_ERRORS.MISSING_AUTH }],
           };
         }
 
@@ -46,6 +45,18 @@ export function registerMMIFilterTool(server: McpServer) {
           params,
           headers
         );
+
+        // Check for HTTP error response (e.g., 401 Unauthorized)
+        if (isHttpError(responseData)) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: formatHttpError(responseData),
+              },
+            ],
+          };
+        }
 
         if (!responseData) {
           return {

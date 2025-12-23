@@ -11,7 +11,7 @@ export const AccuracyFilterSchema = z.object({
 
 export const exclusionsSchema = z.object({
   id: z.bigint().optional().describe("Exclusion ID"),
-  type: z.enum(["INCLUDE", "EXCLUDE"]).describe("Exclusion type"),
+  type: z.enum(["EXCLUDE"]).describe("Exclusion type"),
   value: z
     .enum([
       "MY_REVEALED_EXPORTED_LEADS",
@@ -31,7 +31,7 @@ export const miscellaneousFilterSchema = z.object({
   exclusions: z
     .array(exclusionsSchema)
     .optional()
-    .describe("List of exclusions to filter by"),
+    .describe("List of exclusions to filter by. Only EXCLUDE is allowed"),
 });
 
 export type MiscellaneousFilter = z.infer<typeof miscellaneousFilterSchema>;

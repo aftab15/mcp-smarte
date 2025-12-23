@@ -48,7 +48,7 @@ export const DataItemAccountSchema = z.object({
   pc_comp_guid: z
     .string()
     .describe(
-      "Unique SMARTe company GUID (pc_comp_guid) to get the comp guid use enrich Account tool."
+      "Unique SMARTe company GUID (pc_comp_guid). IMPORTANT: Always use the 'enrich Account' tool to retrieve available pc_comp_guid."
     ),
   type: z.enum(["INCLUDE", "EXCLUDE"]).optional().describe("Type of filter"),
 });

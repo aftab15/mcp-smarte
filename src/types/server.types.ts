@@ -11,7 +11,8 @@ export interface ServerConfig {
   nodeEnv: string;
   corsOrigin: string;
   appGatewayUrl: string;
-  enrichLeadUrl: string;
-  enrichAccountUrl: string;
+  enrichUrl: string;
+  enrichApiKey: string;
   userAgent?: string;
+  mcpServerUrl: string;
 }

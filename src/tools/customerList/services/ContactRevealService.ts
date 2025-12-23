@@ -1,11 +1,21 @@
 import { config } from "../../../config/config";
-import { makePOSTRequest } from "../../../services/http";
-import { ContactRevealRequest } from "../request/contactRevealRequestSchema";
+import {
+  formatHttpError,
+  isHttpError,
+  makePOSTRequest,
+} from "../../../services/http";
+import {
+  ContactRevealDataItem,
+  ContactRevealRequest,
+} from "../request/contactRevealRequestSchema";
 import {
   CONTACT_REVEAL_ENDPOINTS,
   CONTACT_REVEAL_ERRORS,
 } from "../constants/contactRevealConstants";
-import { ValidationResult } from "../types/contactRevealTypes";
+import {
+  ContactRevealedGuidsResponse,
+  ValidationResult,
+} from "../types/contactRevealTypes";
 
 /**
  * Contact Reveal Service
@@ -37,13 +47,90 @@ export class ContactRevealService {
       )
     );
 
-    const requestPayload = {
-      data: requestBody.data,
-      revealSource: "Employee List",
-      type: "NEW",
-    };
-    const data = await makePOSTRequest<unknown>(url, requestPayload, headers);
-    return data;
+    const existingGuids = await this.verifyExistingContactReveal(
+      requestBody.data.map((item) => item.conGuid),
+      headers
+    );
+
+    const newGuidsRequestData: ContactRevealDataItem[] = [];
+    const existingGuidsRequestData: ContactRevealDataItem[] = [];
+    requestBody.data.forEach((item) => {
+      if (existingGuids[item.conGuid]) {
+        existingGuidsRequestData.push(item);
+      } else {
+        newGuidsRequestData.push(item);
+      }
+    });
+
+    let responseData: Record<string, unknown> = {};
+
+    if (existingGuidsRequestData.length > 0) {
+      const existingGuidsRequestPayload = {
+        data: existingGuidsRequestData,
+        revealSource: "Employee List",
+        type: "EXISTING",
+      };
+      const existingGuidsResponse = await makePOSTRequest<any>(
+        url,
+        existingGuidsRequestPayload,
+        headers
+      );
+      if (
+        existingGuidsResponse?.status?.statusCode === 200 &&
+        existingGuidsResponse?.data
+      ) {
+        responseData = { ...responseData, ...existingGuidsResponse.data };
+      }
+    }
+
+    if (newGuidsRequestData.length > 0) {
+      const newGuidsRequestPayload = {
+        data: newGuidsRequestData,
+        revealSource: "Employee List",
+        type: "NEW",
+      };
+      const newGuidsResponse = await makePOSTRequest<any>(
+        url,
+        newGuidsRequestPayload,
+        headers
+      );
+      if (
+        newGuidsResponse?.status?.statusCode === 200 &&
+        newGuidsResponse?.data
+      ) {
+        responseData = { ...responseData, ...newGuidsResponse.data };
+      }
+    }
+
+    return { data: responseData };
+  }
+
+  public static async verifyExistingContactReveal(
+    guids: string[],
+    headers: Record<string, string>
+  ): Promise<Record<string, boolean>> {
+    const url =
+      config.appGatewayUrl + CONTACT_REVEAL_ENDPOINTS.EXISTING_REVEAL_LIST;
+
+    const response = await makePOSTRequest<ContactRevealedGuidsResponse>(
+      url,
+      {},
+      headers
+    );
+
+    if (!response) {
+      throw new Error(CONTACT_REVEAL_ERRORS.FAILED_RETRIEVE);
+    }
+
+    if (isHttpError(response)) {
+      throw new Error(formatHttpError(response));
+    }
+
+    const revealedList = response.data?.revealedList;
+    return guids.reduce((acc, guid) => {
+      acc[guid] = revealedList?.includes(guid) || false;
+      return acc;
+    }, {} as Record<string, boolean>);
   }
 
   /**

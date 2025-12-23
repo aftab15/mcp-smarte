@@ -8,13 +8,11 @@ export const config: ServerConfig = {
   port: parseInt(process.env.PORT || "3000"),
   nodeEnv: process.env.NODE_ENV || "development",
   corsOrigin: process.env.CORS_ORIGIN || "*",
-  appGatewayUrl:
-    process.env.APP_GATEWAY_URL || "https://testigapp.smarteinc.com",
-  enrichLeadUrl:
-    process.env.ENRICH_LEAD_URL || "https://api.smarte.pro/v7/enrich",
-  enrichAccountUrl:
-    process.env.ENRICH_ACCOUNT_URL || "https://api.smarte.pro/v7/enrich",
+  appGatewayUrl: process.env.APP_GATEWAY_URL || "",
+  enrichUrl: process.env.ENRICH_URL || "",
+  enrichApiKey: process.env.ENRICH_API_KEY || "",
   userAgent: process.env.USER_AGENT,
+  mcpServerUrl: process.env.MCP_SERVER_URL || "",
 };
 
 export const PROJECT_VERSION = "1.0.0";

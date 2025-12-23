@@ -31,7 +31,8 @@ Returns comprehensive company data including:
       companyGuid,
       recordId,
     }) => {
-      const url = config.enrichAccountUrl;
+      const url = config.enrichUrl;
+      const apiKey = config.enrichApiKey;
 
       const requestBody = {
         companyName,
@@ -43,16 +44,24 @@ Returns comprehensive company data including:
 
       const headers = getForwardedHeaders();
 
-      if (!headers || !headers["apikey"]) {
-        return { content: [{ type: "text", text: "Missing API Key header" }] };
+      if (!apiKey) {
+        return {
+          content: [{ type: "text", text: "Missing API Key" }],
+        };
       }
+
+      headers["apikey"] = apiKey;
 
       const data = await makePOSTRequest<unknown>(url, requestBody, headers);
       if (!data) {
-        return { content: [{ type: "text", text: "Failed to enrich account data" }] };
+        return {
+          content: [{ type: "text", text: "Failed to enrich account data" }],
+        };
       }
 
-      return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+      return {
+        content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+      };
     }
   );
 }

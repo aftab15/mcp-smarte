@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatGPT Widget Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f3f4f6;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 { color: #111827; margin-bottom: 8px; }
+    p { color: #6b7280; margin-bottom: 24px; }
+    .test-controls {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .test-controls label { font-weight: 500; margin-right: 12px; }
+    .test-controls select {
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .widget-frame {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      overflow: hidden;
+      max-width: 500px;
+    }
+    .frame-header {
+      background: #1e293b;
+      color: white;
+      padding: 8px 12px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .frame-header .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .frame-header .dot.red { background: #ef4444; }
+    .frame-header .dot.yellow { background: #f59e0b; }
+    .frame-header .dot.green { background: #10b981; }
+    #widget-container {
+      padding: 0;
+      min-height: 200px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 ChatGPT Widget Local Test</h1>
+  <p>Test your SmarteAI widget locally before deploying to ChatGPT</p>
+
+  <div class="test-controls">
+    <label>Select Widget Type:</label>
+    <select id="widget-type" onchange="loadWidget()">
+      <option value="contact_reveal">Contact Card</option>
+      <option value="account_reveal">Account Card</option>
+      <option value="search_results">Search Results</option>
+      <option value="data_insights">Data Insights</option>
+      <option value="error">Error Card</option>
+    </select>
+  </div>
+
+  <div class="widget-frame">
+    <div class="frame-header">
+      <span class="dot red"></span>
+      <span class="dot yellow"></span>
+      <span class="dot green"></span>
+      <span style="margin-left: 8px;">ChatGPT Widget Preview</span>
+    </div>
+    <div id="widget-container">
+      <div id="root"></div>
+    </div>
+  </div>
+
+  <script>
+    // Sample data for testing
+    const sampleData = {
+      contact_reveal: {
+        type: 'contact_reveal',
+        data: {
+          contactInfo: {
+            conGuid: 'contact-123',
+            fullName: 'John Smith',
+            email: 'john.smith@techcorp.com',
+            phone: '+1 (555) 123-4567',
+            directDial: '+1 (555) 987-6543',
+            jobTitle: 'VP of Engineering',
+            level: 'VP',
+            department: 'Engineering',
+            linkedInUrl: 'https://linkedin.com/in/johnsmith',
+            workLocation: {
+              city: 'San Francisco',
+              state: 'CA',
+              country: 'United States',
+            },
+          },
+          companyInfo: {
+            compGuid: 'company-456',
+            companyName: 'TechCorp Inc.',
+            website: 'https://techcorp.com',
+            industry: 'Technology',
+            revenue: '$50M - $100M',
+            employeeSize: '500-1000',
+          }
+        }
+      },
+      account_reveal: {
+        type: 'account_reveal',
+        data: {
+          accountInfo: {
+            compGuid: 'company-789',
+            companyName: 'Innovation Labs',
+            website: 'https://innovationlabs.io',
+            industry: 'Software Development',
+            revenue: '$100M - $500M',
+            employeeSize: '1000-5000',
+            foundedYear: 2010,
+            description: 'Leading provider of enterprise software solutions.',
+            linkedInUrl: 'https://linkedin.com/company/innovationlabs',
+            phone: '+1 (800) 555-0199',
+            headquarters: {
+              city: 'Austin',
+              state: 'TX',
+              country: 'United States',
+            },
+            technologies: ['React', 'Node.js', 'AWS', 'Kubernetes', 'PostgreSQL', 'Redis'],
+          },
+          contacts: [
+            { fullName: 'Sarah Johnson', jobTitle: 'CTO' },
+            { fullName: 'Mike Chen', jobTitle: 'Director of Sales' },
+            { fullName: 'Emily Davis', jobTitle: 'Product Manager' },
+          ]
+        }
+      },
+      search_results: {
+        type: 'search_results',
+        data: {
+          contacts: [
+            { conGuid: '1', fullName: 'Alice Brown', jobTitle: 'CEO', email: 'alice@company1.com' },
+            { conGuid: '2', fullName: 'Bob Wilson', jobTitle: 'CFO', email: 'bob@company2.com' },
+            { conGuid: '3', fullName: 'Carol Martinez', jobTitle: 'CMO', email: 'carol@company3.com' },
+          ],
+          accounts: [
+            { compGuid: 'a1', companyName: 'Alpha Corp', industry: 'Finance', employeeSize: '100-500' },
+            { compGuid: 'a2', companyName: 'Beta Industries', industry: 'Manufacturing', employeeSize: '500-1000' },
+          ],
+          totalCount: 1250,
+          pageSize: 10,
+          currentPage: 1,
+        }
+      },
+      data_insights: {
+        type: 'data_insights',
+        data: {
+          totalRecords: 15420,
+          aggregationType: 'Industry',
+          breakdown: [
+            { category: 'Technology', count: 4520, percentage: 29.3 },
+            { category: 'Finance', count: 3210, percentage: 20.8 },
+            { category: 'Healthcare', count: 2890, percentage: 18.7 },
+            { category: 'Manufacturing', count: 1950, percentage: 12.6 },
+            { category: 'Retail', count: 1420, percentage: 9.2 },
+            { category: 'Education', count: 890, percentage: 5.8 },
+            { category: 'Other', count: 540, percentage: 3.5 },
+          ],
+        }
+      },
+      error: {
+        type: 'error',
+        data: {
+          message: 'Unable to fetch contact data. The server returned an authentication error.',
+          code: 401
+        }
+      }
+    };
+
+    // Simulate window.openai API
+    window.openai = {
+      toolOutput: sampleData.contact_reveal,
+      locale: 'en-US',
+      sessionId: 'test-session-123',
+      triggerServerAction: (action, payload) => {
+        console.log('Server Action:', action, payload);
+        alert('Action triggered: ' + action);
+      },
+      sendFollowUp: (message) => {
+        console.log('Follow-up:', message);
+      },
+      getPersistedState: () => null,
+      persistState: (state) => console.log('Persist:', state),
+    };
+
+    function loadWidget() {
+      const type = document.getElementById('widget-type').value;
+      window.openai.toolOutput = sampleData[type];
+      
+      // Clear and reload widget
+      const container = document.getElementById('root');
+      container.innerHTML = '';
+      
+      // Re-import the widget module
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = './widget.tsx';
+      document.body.appendChild(script);
+      
+      // For Vite dev server, we need to trigger a re-render
+      if (window.__WIDGET_RELOAD__) {
+        window.__WIDGET_RELOAD__();
+      }
+    }
+
+    // Initial load message
+    console.log('Widget test page loaded. Select a widget type to preview.');
+  </script>
+  
+  <!-- Load the widget -->
+  <script type="module" src="./widget.tsx"></script>
+</body>
+</html>

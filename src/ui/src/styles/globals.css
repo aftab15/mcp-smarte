@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --smarte-primary: 37 99 235;
+    --smarte-secondary: 124 58 237;
+    --smarte-accent: 6 182 212;
+    --smarte-success: 16 185 129;
+    --smarte-warning: 245 158 11;
+    --smarte-error: 239 68 68;
+  }
+}
+
+@layer components {
+  .card-base {
+    @apply bg-white rounded-xl shadow-card border border-gray-100 overflow-hidden transition-all duration-200;
+  }
+  
+  .card-base:hover {
+    @apply shadow-card-hover;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply bg-blue-100 text-blue-800;
+  }
+  
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+  
+  .badge-error {
+    @apply bg-red-100 text-red-800;
+  }
+  
+  .icon-wrapper {
+    @apply flex items-center justify-center w-10 h-10 rounded-lg;
+  }
+}

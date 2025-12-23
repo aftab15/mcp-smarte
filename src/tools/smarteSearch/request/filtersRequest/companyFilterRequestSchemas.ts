@@ -4,10 +4,8 @@ import {
   DataItemAccountSchema,
   RangeFilterSchema,
 } from "../CommonRequest";
-import {
-  ContactFunctionEnum,
-  LocationFilterSchema,
-} from "./contactFilterRequestSchemas";
+import { LocationFilterSchema } from "./contactFilterRequestSchemas";
+import { FUNCTION_NAMES } from "../../constants/contactFunctions";
 
 /**
  * Company revenue filter schema
@@ -15,14 +13,19 @@ import {
  */
 export const CompanyRevenueValueFilterSchema = z.object({
   name: z.enum([
-    "$0 - 1M",
-    "$1 - 10M",
-    "$10 - 50M",
-    "$50 - 100M",
-    "$100 - 250M",
-    "$250 - 500M",
-    "$500 - 1B",
-    "$1B+",
+    "$0 - $500K",
+    "$500K - $1M",
+    "$1M - $5M",
+    "$5M - $10M",
+    "$10M - $25M",
+    "$25M - $50M",
+    "$50M - $100M",
+    "$100M - $250M",
+    "$250M - $500M",
+    "$500M - $1B",
+    "$1B - $5B",
+    "$5B - $10B",
+    "$10B+",
   ]),
   type: z.enum(["INCLUDE", "EXCLUDE"]),
 });
@@ -91,7 +94,7 @@ export const FortuneSchema = z.object({
 
 export const departmentHeadCountSchema = z.object({
   department: z.object({
-    name: z.enum(ContactFunctionEnum),
+    name: z.enum(FUNCTION_NAMES),
     type: z.enum(["INCLUDE", "EXCLUDE"]),
   }),
   headCount: RangeFilterSchema.describe("Department headcount to filter by"),
@@ -163,14 +166,15 @@ export const CompanyFilterSchema = z.object({
     .describe("Department headcount to filter by"),
 
   location: LocationFilterSchema.optional().describe(
-    "Company  Global HQ locations to filter by"
+    "Company  Global HQ locations to filter by. IMPORTANT: Always use the 'location_filter' tool to retrieve available locations."
   ),
   globalHeadCount: CompanyEmployeeSizeValueFilterSchema.optional().describe(
     "Company Global headcount to filter by"
   ),
-  globalRevenue: CompanyRevenueValueFilterSchema.optional().describe(
-    "Company Global revenue to filter by"
-  ),
+  globalRevenue: z
+    .array(CompanyRevenueValueFilterSchema)
+    .optional()
+    .describe("Company Global revenue to filter by"),
   industry: z
     .array(industrySchema)
     .optional()
@@ -190,11 +194,15 @@ export const CompanyFilterSchema = z.object({
   isMultiNationalCompany: z
     .string()
     .optional()
-    .describe("Is multi-national company to filter by in Yes or No"),
+    .describe(
+      "Indicates if the company is a multinational company. Filter by in Yes or No"
+    ),
   isSubsidiary: z
     .string()
     .optional()
-    .describe("Is subsidiary to filter by in Yes or No"),
+    .describe(
+      "Indicates if the company is owned or controlled by another company. Filter by in Yes or No"
+    ),
 });
 
 /**

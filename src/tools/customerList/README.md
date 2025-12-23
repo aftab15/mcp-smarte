@@ -75,6 +75,54 @@ Reveals comprehensive account information using company GUIDs.
 }
 ```
 
+### 3. Lists Filter
+
+Filter customer lists by type with optional search text and pagination.
+
+**Tool Name:** `lists_filter`
+
+**Description:** Filter lists of type `LEAD` or `ACCOUNT` using `searchText`. Supports both `pageIndex`/`page_no` (alias) and `pageSize` with validation.
+
+**Input Schema:**
+```typescript
+{
+  data: {
+    searchText?: string; // optional, defaults to ""
+  };
+  pagination: {
+    pageIndex?: number; // int, min 1, defaults to 1
+    page_no?: number;   // alias for page index, min 1, defaults to 1
+    pageSize?: number;  // int, min 1, max 200, defaults to 50
+  };
+  type: "LEAD" | "ACCOUNT";
+}
+```
+
+**Validation Rules:**
+- **Type:** must be `LEAD` or `ACCOUNT`
+- **Pagination:**
+  - `pageIndex` ≥ 1
+  - `page_no` ≥ 1
+  - `pageSize` ∈ [1, 200]
+
+**Endpoint:**
+- **LEAD:** `/customer-list/v1/lead-list/lead-lists`
+- **ACCOUNT:** `/customer-list/v1/account-list/account-lists`
+
+**Example Usage:**
+```json
+{
+  "type": "LEAD",
+  "data": {
+    "searchText": "marketing"
+  },
+  "pagination": {
+    "pageIndex": 1,
+    "pageSize": 25
+  }
+}
+```
+
 ## Architecture
 
 ### Layered Architecture

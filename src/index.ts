@@ -1,9 +1,15 @@
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 import { runWithRequestContext } from "./context";
-import { authGate } from "./middleware/auth";
 import { createMcpServer } from "./mcpServer";
-import { config, PROJECT_VERSION } from "./config/config";
+import { config } from "./config/config";
+import { serverInfo } from "./constants/information";
+import { makePOSTRequest } from "./services/http";
+
+const RESOURCE_METADATA_URL =
+  config.mcpServerUrl + "/.well-known/oauth-protected-resource/mcp";
+const WWW_HEADER_KEY = "WWW-Authenticate";
+const WWW_HEADER_VALUE = `Bearer realm="OAuth", resource_metadata="${RESOURCE_METADATA_URL}"`;
 
 const server = createMcpServer();
 
@@ -41,13 +47,91 @@ async function main() {
     next();
   });
 
+  app.use(async (req, res, next) => {
+    if (
+      req.path.startsWith("/.well-known") ||
+      req.path === "/health" ||
+      req.path === "/docs"
+    ) {
+      return next();
+    }
+
+    const header = req.headers.authorization;
+    const token = header?.startsWith("Bearer ")
+      ? header.slice("Bearer ".length).trim()
+      : undefined;
+
+    if (!token) {
+      res
+        .status(401)
+        .set(WWW_HEADER_KEY, WWW_HEADER_VALUE)
+        .json({ error: "Unauthorized" });
+      return;
+    }
+
+    try {
+      const url = config.appGatewayUrl + "/oauth2/introspect";
+      const requestPayload = {};
+      const headers = {
+        token: token,
+        token_type_hint: "access_token",
+      };
+      const data = await makePOSTRequest<any>(url, requestPayload, headers);
+
+      if (
+        data == null ||
+        (data.error &&
+          (data.error.status === 401 ||
+            data.error.status === 400 ||
+            data.error.status === 403))
+      ) {
+        res
+          .status(401)
+          .setHeader(WWW_HEADER_KEY, WWW_HEADER_VALUE)
+          .json({ error: "Unauthorized" });
+        return;
+      }
+      return next();
+    } catch (error) {
+      res
+        .status(401)
+        .setHeader(WWW_HEADER_KEY, WWW_HEADER_VALUE)
+        .json({ error: "Token validation failed" });
+      return;
+    }
+  });
+
+  // Server info endpoint
+  const serverInfoHandler = (req: express.Request, res: express.Response) => {
+    res.json(serverInfo);
+  };
+
+  app.get("/docs", serverInfoHandler);
+
+  app.get("/.well-known/oauth-protected-resource/mcp", (req, res) => {
+    console.log("/.well-known/oauth-protected-resource/mcp called");
+
+    res.json({
+      resource: config.mcpServerUrl + "/mcp",
+      authorization_servers: [config.appGatewayUrl],
+      bearer_methods_supported: ["header"],
+      scopes_supported: ["mcp.read", "mcp.write"],
+      resource_documentation: config.mcpServerUrl + "/docs",
+    });
+  });
+
   // Health check endpoint
   app.get("/health", (req, res) => {
     res.json({
       status: "ok",
       mode: "http-fixed",
-      version: PROJECT_VERSION,
-      uptime: Math.floor(process.uptime()),
+      version: serverInfo.version,
+      uptime: (() => {
+        const totalSeconds = Math.floor(process.uptime());
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        return `${hours}h ${minutes}m`;
+      })(),
       memory: {
         used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
         total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
@@ -57,9 +141,9 @@ async function main() {
     });
   });
 
+  // MCP endpoint
   app.post(
     "/mcp",
-    authGate,
     async (req: express.Request, res: express.Response): Promise<void> => {
       let transport: StreamableHTTPServerTransport | null = null;
       const requestId = Math.random().toString(36).substring(7);

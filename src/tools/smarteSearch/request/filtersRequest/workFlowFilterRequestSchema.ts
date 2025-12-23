@@ -20,13 +20,13 @@ export const workFlowFilterSchema = z.object({
     .array(ValueFilterSchema)
     .optional()
     .describe(
-      "List of SMARTe created lead-list IDs to filter by. to get the required created all lead lists calling respected tool"
+      "List of SMARTe created lead-list IDs to filter by. IMPORTANT: Always use the 'lists_filter_value' tool to retrieve available lead-list IDs."
     ),
   accountList: z
     .array(ValueFilterSchema)
     .optional()
     .describe(
-      "List of SMARTe created account-list IDs to filter by. to get the required created all account lists calling respected tool"
+      "List of SMARTe created account-list IDs to filter by. IMPORTANT: Always use the 'lists_filter_value' tool to retrieve available account-list IDs."
     ),
 });
 

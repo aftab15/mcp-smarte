@@ -22,7 +22,7 @@ export const ContactRevealRequestSchema = z.object({
     .array(ContactRevealDataItemSchema)
     .min(1)
     .describe(
-      "Array of contact and company GUID pairs to reveal. At least one pair is required."
+      "Reveals contact phone numbers or work emails using contact–company GUID pairs. Requires an array of GUID pairs (at least one). Supports single or multiple reveal requests."
     ),
 });
 

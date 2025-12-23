@@ -7,6 +7,7 @@
  */
 export const CONTACT_REVEAL_ENDPOINTS = {
   REVEAL: "/customer-list/v2/reveal/contact-reveal",
+  EXISTING_REVEAL_LIST: "/customer-list/v2/reveal/contact-revealed-guid",
 } as const;
 
 /**
@@ -21,6 +22,9 @@ export const CONTACT_REVEAL_ERRORS = {
   MISSING_COMP_GUID: "Missing company GUID (compGuid)",
 } as const;
 
+export const CONTACT_REVEALED_GUID_ERROR = {
+  FAILED_RETRIEVE: "Failed to retrieve contact revealed GUIDs",
+} as const;
 /**
  * Success Messages
  */
