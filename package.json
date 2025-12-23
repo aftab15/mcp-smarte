@@ -21,6 +21,7 @@
     "dev:pod3": "tsx watch --env-file=.env.pod3 src/index.ts",
     "dev:prod1": "tsx watch --env-file=.env.prod1 src/index.ts",
     "dev:prod2": "tsx watch --env-file=.env.prod2 src/index.ts",
+    "prestart:testProd": "npm install --prefix src/ui",
     "dev:testProd": "tsx watch --env-file=.env.testProd src/index.ts"
   },
   "keywords": [],
